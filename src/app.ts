@@ -1,6 +1,8 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { UserRoutes } from "./routes/userRoute";
+import { AiRoutes } from "./routes/aiRoute";
+import { ItemRoutes } from "./routes/itemRoute";
 
 const app: Application = express();
 
@@ -10,6 +12,8 @@ app.use(cors());
 
 // বেসিক রুট
 app.use("/api/auth", UserRoutes);
+app.use("/api/ai", AiRoutes);
+app.use("/api/items", ItemRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
@@ -17,5 +21,21 @@ app.get("/", (req: Request, res: Response) => {
     message: "Welcome to Krishoky API Services!",
   });
 });
+
+app.use(
+  (
+    err: Error & { statusCode?: number },
+    _req: Request,
+    res: Response,
+    _next: NextFunction,
+  ) => {
+    const statusCode = err.statusCode || 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message: err.message || "Something went wrong",
+    });
+  },
+);
 
 export default app;

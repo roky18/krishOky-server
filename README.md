@@ -39,10 +39,7 @@
 
     ```env
     PORT=5000
-    DATABASE_URL=your_mongodb_uri
-    BCRYPT_SALT_ROUNDS=12
-    JWT_ACCESS_SECRET=your_jwt_secret
-    GEMINI_API_KEY=your_google_gemini_api_key
+
     ```
 
 4.  **Run the server:**
