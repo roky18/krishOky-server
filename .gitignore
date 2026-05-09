@@ -1,0 +1,15 @@
+# ডিরেক্টরি
+node_modules/
+dist/
+
+# এনভায়রনমেন্ট ফাইল 
+.env
+
+# লগ ফাইল
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ওএস ফাইল
+.DS_Store
+Thumbs.db
