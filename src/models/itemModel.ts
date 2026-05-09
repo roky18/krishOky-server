@@ -7,7 +7,7 @@ const itemSchema = new Schema(
     price: { type: Number, required: true },
     category: {
       type: String,
-      enum: ["Seeds", "Fertilizer", "Tools", "Others"],
+      enum: ["Seeds", "Fertilizer", "Tools", "Branding", "Others"],
       required: true,
     },
     image: { type: String }, // ইমেজের ইউআরএল

@@ -1,10 +1,16 @@
-import express from 'express';
-import { ItemControllers } from '../controllers/itemController'; 
+import express from "express";
+import { ItemControllers } from "../controllers/itemController";
+import { upload } from "../utils/sendImageToCloudinary";
 
 const router = express.Router();
 
-// ItemControllers (plural) ব্যবহার করো
-router.post('/create-item', ItemControllers.createItem);
-router.get('/', ItemControllers.getAllItems);
+// এখানে ভুল ছিল, ডুপ্লিকেট রুটগুলো সরিয়ে শুধু এটা রাখো:
+router.get("/", ItemControllers.getAllItems);
+
+router.post(
+  "/create-item",
+  upload.single("file"), // ফাইল আপলোডের জন্য মুল্টার মিডলওয়্যার
+  ItemControllers.createItem,
+);
 
 export const ItemRoutes = router;
