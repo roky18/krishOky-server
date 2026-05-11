@@ -65,6 +65,10 @@ const createItem = catchAsync(async (req: Request, res: Response) => {
   // ৬. ফাইনাল ডাটা অবজেক্ট
   const itemData = {
     ...body,
+    title: {
+      bn: body.titleBn || body.title?.bn || body.title,
+      en: body.titleEn || body.title?.en || body.title,
+    },
     description: {
       en: enDescription,
       bn: bnDescription,
