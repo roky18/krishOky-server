@@ -15,18 +15,26 @@
 //   getAllItemsFromDB,
 // };
 
-
-// src/services/itemService.ts
 import { Item } from "../models/itemModel";
 
+// ১. আইটেম তৈরি করার সার্ভিস
+const createItemIntoDB = async (payload: any) => {
+  const result = await Item.create(payload);
+  return result;
+};
+
+// ২. সব আইটেম গেট করার সার্ভিস (ফিল্টার, সার্চ এবং সর্টিং সহ)
 const getAllItemsFromDB = async (query: Record<string, unknown>) => {
   const { searchTerm, category, minPrice, maxPrice, sort } = query;
 
   let filter: any = {};
 
-  // ১. সার্চ লজিক (নাম দিয়ে খোঁজা)
+  // ১. সার্চ লজিক: নাম দিয়ে খোঁজা (বাংলা ও ইংলিশ দুইটাই চেক করবে)
   if (searchTerm) {
-    filter.title = { $regex: searchTerm, $options: "i" }; // 'i' মানে ছোট-বড় হাতের অক্ষরের পার্থক্য করবে না
+    filter.$or = [
+      { "title.en": { $regex: searchTerm, $options: "i" } },
+      { "title.bn": { $regex: searchTerm, $options: "i" } },
+    ];
   }
 
   // ২. ক্যাটাগরি ফিল্টার
@@ -47,12 +55,12 @@ const getAllItemsFromDB = async (query: Record<string, unknown>) => {
     sortStr = sort as string; // সর্টিং প্যারামিটার (যেমন: price বা -price)
   }
 
-  const result = await Item.find(filter).sort(sortStr);
+  // populate("sellerId") যোগ করেছি যাতে বিক্রেতার তথ্যও সাথে পাওয়া যায়
+  const result = await Item.find(filter).sort(sortStr).populate("sellerId");
   return result;
 };
 
-// ItemServices অবজেক্টে এটি আপডেট করে দাও
 export const ItemServices = {
-  createItemIntoDB: async (payload: any) => await Item.create(payload),
+  createItemIntoDB,
   getAllItemsFromDB,
 };

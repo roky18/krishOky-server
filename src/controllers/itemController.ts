@@ -1,33 +1,75 @@
+import { Request, Response } from "express"; // Express টাইপ ইমপোর্ট
 import { AiServices } from "../services/aiService";
 import { ItemServices } from "../services/itemService";
 import catchAsync from "../utils/catchAsync";
 import sendResponse from "../utils/sendResponse";
-import { sendImageToCloudinary } from "../utils/sendImageToCloudinary"; // ইম্পোর্ট করো
+import { sendImageToCloudinary } from "../utils/sendImageToCloudinary";
 
-const createItem = catchAsync(async (req, res) => {
-  const { title } = req.body;
+// ১. ক্লাউডিনারি রেসপন্সের জন্য টাইপ (any এড়াতে)
+interface ICloudinaryResponse {
+  secure_url: string;
+  [key: string]: unknown;
+}
 
-  const file = (req as any).file;
+// ২. কাস্টম রিকোয়েস্ট টাইপ (req.file এবং টাইপ করা বডির জন্য)
+interface IItemRequest extends Request {
+  body: {
+    data?: string; // যদি JSON স্ট্রিং হিসেবে আসে
+    title: { bn: string; en: string };
+    price: number;
+    category: string;
+    stock: number;
+    sellerId: string;
+  };
+  file?: Express.Multer.File; // Multer ফাইলের টাইপ
+}
 
-  // ১. ইমেজ হ্যান্ডেল করা
+const createItem = catchAsync(async (req: Request, res: Response) => {
+  // টাইপ কাস্টিং করে any এরর দূর করা
+  const typedReq = req as IItemRequest;
+
+  // ৩. ডাটা পার্স করা
+  const body = typedReq.body.data
+    ? JSON.parse(typedReq.body.data)
+    : typedReq.body;
+  const { title } = body;
+  const file = typedReq.file;
+
+  // ৪. ইমেজ হ্যান্ডেল করা
   let imageUrl = "";
   if (file) {
-    const path = file.path; // ইমেজ যেখানে জমা আছে
-    const imageName = `${title}-${Date.now()}`;
+    const path = file.path;
+    const imageName = `${title.en}-${Date.now()}`;
 
-    // ক্লাউডিনারিতে পাঠানো
-    const uploadResult: any = await sendImageToCloudinary(imageName, path);
-    imageUrl = uploadResult.secure_url; // আপলোড করা ছবির অনলাইন লিঙ্ক
+    // এখানে any এর বদলে ICloudinaryResponse ব্যবহার করা হয়েছে
+    const uploadResult = (await sendImageToCloudinary(
+      imageName,
+      path,
+    )) as ICloudinaryResponse;
+    imageUrl = uploadResult.secure_url;
   }
 
-  // ২. এআই ডেসক্রিপশন জেনারেট করা
-  const aiDescription = await AiServices.generateResponseFromAI(title);
+  // ৫. মাল্টি-ল্যাঙ্গুয়েজ এআই ডেসক্রিপশন
+  const enDescPromise = AiServices.generateResponseFromAI(
+    `Generate a short professional product description in English for: ${title.en}`,
+  );
+  const bnDescPromise = AiServices.generateResponseFromAI(
+    `এই পণ্যটির জন্য একটি ছোট প্রফেশনাল বিবরণ বাংলায় তৈরি করুন: ${title.bn}`,
+  );
 
-  // ৩. ডেসক্রিপশন এবং ইমেজের লিঙ্কসহ ডাটা তৈরি
+  const [enDescription, bnDescription] = await Promise.all([
+    enDescPromise,
+    bnDescPromise,
+  ]);
+
+  // ৬. ফাইনাল ডাটা অবজেক্ট
   const itemData = {
-    ...req.body,
-    description: aiDescription,
-    image: imageUrl, // ডাটাবেজে ইমেজের লিঙ্ক চলে যাবে
+    ...body,
+    description: {
+      en: enDescription,
+      bn: bnDescription,
+    },
+    image: imageUrl,
   };
 
   const result = await ItemServices.createItemIntoDB(itemData);
@@ -35,13 +77,13 @@ const createItem = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: "Item created with Image & AI description!",
+    message: "Item created with Image & Multilingual AI description!",
     data: result,
   });
 });
 
-const getAllItems = catchAsync(async (req, res) => {
-  // req.query পাস করে দাও, যাতে সার্চ এবং ফিল্টারিং কাজ করে
+const getAllItems = catchAsync(async (req: Request, res: Response) => {
+  // req.query এর টাইপ নেক্সট লেভেলে হ্যান্ডেল করা আছে সার্ভিসে
   const result = await ItemServices.getAllItemsFromDB(req.query);
 
   sendResponse(res, {

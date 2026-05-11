@@ -1,9 +1,16 @@
 import { Schema, model } from "mongoose";
+import { IItem } from "../interfaces/itemInterface";
 
-const itemSchema = new Schema(
+const itemSchema = new Schema<IItem>(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true }, // এখানে এআই জেনারেটেড লেখা থাকবে
+    title: {
+      bn: { type: String, required: true },
+      en: { type: String, required: true },
+    },
+    description: {
+      bn: { type: String, required: true },
+      en: { type: String, required: true },
+    },
     price: { type: Number, required: true },
     category: {
       type: String,
@@ -19,4 +26,4 @@ const itemSchema = new Schema(
   },
 );
 
-export const Item = model("Item", itemSchema);
+export const Item = model<IItem>("Item", itemSchema);
