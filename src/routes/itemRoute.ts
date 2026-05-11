@@ -7,7 +7,7 @@ const router = express.Router();
 // এখানে ভুল ছিল, ডুপ্লিকেট রুটগুলো সরিয়ে শুধু এটা রাখো:
 router.get("/", ItemControllers.getAllItems);
 
-router.post("/create-item", ItemControllers.createItem);
+router.get("/:id", ItemControllers.getSingleItem);
 
 router.post(
   "/create-item",

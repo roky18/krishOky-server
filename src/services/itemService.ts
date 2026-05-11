@@ -60,7 +60,13 @@ const getAllItemsFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+const getSingleItemFromDB = async (id: string) => {
+  const result = await Item.findById(id).populate("sellerId");
+  return result;
+};
+
 export const ItemServices = {
   createItemIntoDB,
   getAllItemsFromDB,
+  getSingleItemFromDB,
 };

@@ -94,7 +94,28 @@ const getAllItems = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleItem = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await ItemServices.getSingleItemFromDB(id as string);
+
+  // যদি ডাটা না পাওয়া যায়, তবে ৪MD৪ এরর রিটার্ন করবে
+  if (!result) {
+    return res.status(404).json({
+      success: false,
+      message: "দুঃখিত, এই পণ্যটি ডাটাবেসে খুঁজে পাওয়া যায়নি!",
+    });
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Item retrieved successfully!",
+    data: result,
+  });
+});
+
 export const ItemControllers = {
   createItem,
   getAllItems,
+  getSingleItem,
 };
