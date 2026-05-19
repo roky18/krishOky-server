@@ -9,6 +9,7 @@ export interface IUser {
   phone?: string;
   role: TUserRole;
   address?: string;
+  image?: string | null;
   isDeleted: boolean;
 }
 

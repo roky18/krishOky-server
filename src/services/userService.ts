@@ -37,7 +37,15 @@ const loginUser = async (payload: Partial<IUser>) => {
     { expiresIn: "1d" },
   );
 
-  return { accessToken };
+  return {
+    accessToken,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      image: user.image || null,
+    },
+  };
 };
 
 export const UserServices = {

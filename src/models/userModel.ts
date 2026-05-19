@@ -10,6 +10,7 @@ const userSchema = new Schema<IUser>(
     phone: { type: String },
     role: { type: String, enum: ["USER", "ADMIN"], default: "USER" },
     address: { type: String },
+    image: { type: String, default: null }, // 👈 এই লাইনটি যোগ করুন
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }, // এটি createdAt এবং updatedAt অটো তৈরি করবে
