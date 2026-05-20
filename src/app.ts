@@ -9,7 +9,10 @@ const app: Application = express();
 // ১. CORS কনফিগারেশন (এটি ফ্রন্টএন্ডের সাথে কানেকশন নিশ্চিত করবে)
 app.use(
   cors({
-    origin: "http://localhost:3000", // আপনার ফ্রন্টএন্ডের URL
+    origin: [
+      "http://localhost:3000", 
+      "https://krishoky-client.vercel.app"
+    ],
     credentials: true,
   }),
 );
