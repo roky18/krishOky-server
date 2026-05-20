@@ -1,18 +1,16 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { UserRoutes } from "./routes/userRoute";
-import { AiRoutes } from "./routes/aiRoute";
+
 import { ItemRoutes } from "./routes/itemRoute";
+import { aiRoutes } from "./routes/aiRoute";
 
 const app: Application = express();
 
 // ১. CORS কনফিগারেশন (এটি ফ্রন্টএন্ডের সাথে কানেকশন নিশ্চিত করবে)
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", 
-      "https://krishoky-client.vercel.app"
-    ],
+    origin: ["http://localhost:3000", "https://krishoky-client.vercel.app"],
     credentials: true,
   }),
 );
@@ -23,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ৩. রুট সেটআপ
 app.use("/api/auth", UserRoutes);
-app.use("/api/ai", AiRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/items", ItemRoutes);
 
 // মেইন রুট
