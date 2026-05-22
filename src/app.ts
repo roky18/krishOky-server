@@ -6,11 +6,16 @@ import { ItemRoutes } from "./routes/itemRoute";
 import { aiRoutes } from "./routes/aiRoute";
 
 const app: Application = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://krishoky-client.vercel.app",
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
 
 // ১. CORS কনফিগারেশন (এটি ফ্রন্টএন্ডের সাথে কানেকশন নিশ্চিত করবে)
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://krishoky-client.vercel.app"],
+    origin: allowedOrigins,
     credentials: true,
   }),
 );

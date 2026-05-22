@@ -84,23 +84,16 @@ const getReviewSummary = catchAsync(async (req: Request, res: Response) => {
 const getChatResponse = catchAsync(async (req: Request, res: Response) => {
   const { prompt } = req.body; // আপনার আগের ফ্রন্টএন্ড বা ইনপুটের 'prompt' কী-টি বজায় রাখা হলো
 
-  if (!prompt) {
-    return sendResponse(res, {
-      statusCode: 400,
+  if (typeof prompt !== "string" || prompt.trim().length === 0) {
+    return res.status(400).json({
       success: false,
-      message: "Prompt/Message is required for AI chat",
-      data: null,
+      message: "Prompt is required for AI chat",
     });
   }
 
-  const reply = await AiServices.getAIChatResponse(prompt);
+  const reply = await AiServices.getAIChatResponse(prompt.trim());
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "AI responded successfully!",
-    data: { reply },
-  });
+  res.json({ data: { reply } });
 });
 
 export const AiControllers = {

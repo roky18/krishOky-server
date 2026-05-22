@@ -1,63 +1,12 @@
-// import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// type THttpError = Error & {
-//   statusCode?: number;
-// };
-
-// const createHttpError = (message: string, statusCode = 500): THttpError => {
-//   const error: THttpError = new Error(message);
-//   error.statusCode = statusCode;
-//   return error;
-// };
-
-// const generateResponseFromAI = async (title: string) => {
-//   if (!title || typeof title !== "string") {
-//     throw createHttpError("Prompt is required.", 400);
-//   }
-
-//   const apiKey = process.env.GEMINI_API_KEY;
-
-//   if (!apiKey) {
-//     throw createHttpError("GEMINI_API_KEY is missing from environment variables.");
-//   }
-
-//   const genAI = new GoogleGenerativeAI(apiKey);
-//   const model = genAI.getGenerativeModel({
-//     model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-//   });
-
-//   const customPrompt = `You are an expert agricultural consultant.
-//   Please write a professional and informative product description for: "${title}".
-//   Explain the benefits and usage of this product for farmers.
-
-//   Important: Detect the language of the input "${title}".
-//   - If the input is in Bangla, provide the full description in Bangla.
-//   - If the input is in English, provide the full description in English.
-//   Always respond in the same language as the input.`;
-
-//   try {
-//     const result = await model.generateContent(customPrompt);
-//     const response = await result.response;
-//     return response.text();
-//   } catch (error) {
-//     console.error("AI Error:", error);
-
-//     if (error instanceof Error) {
-//       throw createHttpError(`AI response generation failed: ${error.message}`);
-//     }
-
-//     throw createHttpError("AI response generation failed.");
-//   }
-// };
-
-// export const AiServices = {
-//   generateResponseFromAI,
-// };
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 type THttpError = Error & {
   statusCode?: number;
+};
+
+const getErrorStatusCode = (error: unknown): number => {
+  const maybeStatus = (error as { status?: unknown })?.status;
+  return typeof maybeStatus === "number" ? maybeStatus : 500;
 };
 
 // কাস্টম HTTP এরর হ্যান্ডলার
@@ -70,14 +19,19 @@ const createHttpError = (message: string, statusCode = 500): THttpError => {
 /**
  * ১. প্রোডাক্ট ক্রিয়েশনের জন্য দ্বী-ভাষিক ডেসক্রিপশন জেনারেটর (Promise.all)
  */
-const generateResponseFromAI = async (title: string): Promise<{ bn: string; en: string }> => {
+const generateResponseFromAI = async (
+  title: string,
+): Promise<{ bn: string; en: string }> => {
   if (!title || typeof title !== "string") {
     throw createHttpError("Product title is required.", 400);
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw createHttpError("GEMINI_API_KEY is missing from environment variables.", 500);
+    throw createHttpError(
+      "GEMINI_API_KEY is missing from environment variables.",
+      500,
+    );
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -103,7 +57,10 @@ const generateResponseFromAI = async (title: string): Promise<{ bn: string; en: 
   } catch (error) {
     console.error("AI Error:", error);
     if (error instanceof Error) {
-      throw createHttpError(`AI response generation failed: ${error.message}`, 500);
+      throw createHttpError(
+        `AI response generation failed: ${error.message}`,
+        getErrorStatusCode(error),
+      );
     }
     throw createHttpError("AI response generation failed.", 500);
   }
@@ -121,7 +78,9 @@ const generateReviewSummary = async (reviews: string[]): Promise<string> => {
   if (!apiKey) throw createHttpError("GEMINI_API_KEY is missing.", 500);
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  });
 
   const reviewsText = reviews.join("\n- ");
   const prompt = `Analyze and summarize the following customer reviews for this product. Provide a single bulleted list highlighting the key pros and cons in a concise professional manner:\n\n- ${reviewsText}`;
@@ -131,6 +90,12 @@ const generateReviewSummary = async (reviews: string[]): Promise<string> => {
     const response = await result.response;
     return response.text()?.trim() || "No summary available.";
   } catch (error) {
+    if (error instanceof Error) {
+      throw createHttpError(
+        `Failed to generate review summary: ${error.message}`,
+        getErrorStatusCode(error),
+      );
+    }
     throw createHttpError("Failed to generate review summary.");
   }
 };
@@ -147,7 +112,9 @@ const getAIChatResponse = async (message: string): Promise<string> => {
   if (!apiKey) throw createHttpError("GEMINI_API_KEY is missing.", 500);
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  });
 
   // চ্যাটবটের জন্য কাস্টম প্রম্পট গাইডলাইনস
   const chatbotPrompt = `You are "KrishOky AI", an expert agricultural assistant. Answer the user's question politely, accurately, and short. Use the exact same language (Bangla or English) that the user used to ask the question. Question: "${message}"`;
@@ -157,6 +124,13 @@ const getAIChatResponse = async (message: string): Promise<string> => {
     const response = await result.response;
     return response.text()?.trim() || "Sorry, I couldn't process that request.";
   } catch (error) {
+    console.error("AI Chatbot Error:", error);
+    if (error instanceof Error) {
+      throw createHttpError(
+        `AI Chatbot failed to respond: ${error.message}`,
+        getErrorStatusCode(error),
+      );
+    }
     throw createHttpError("AI Chatbot failed to respond.");
   }
 };
