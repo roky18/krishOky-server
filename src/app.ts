@@ -4,6 +4,7 @@ import { UserRoutes } from "./routes/userRoute";
 
 import { ItemRoutes } from "./routes/itemRoute";
 import { aiRoutes } from "./routes/aiRoute";
+import communityRoutes from "./routes/communityRoute";
 
 const app: Application = express();
 const allowedOrigins = [
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", UserRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/items", ItemRoutes);
+app.use("/api/community", communityRoutes);
 
 // মেইন রুট
 app.get("/", (req: Request, res: Response) => {
