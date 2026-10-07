@@ -1,46 +1,50 @@
-# 🌾 KrishOky Server
+# 🌾 KrishOky Server - Backend API
 
-**KrishOky** is an AI-powered agricultural platform backend designed to help farmers and users with smart agricultural solutions. Built with a focus on clean architecture, security, and modern AI integration.
+**KrishOky Server** is the robust, scalable RESTful API powering the **KrishOky** AI-driven agricultural platform[cite: 1, 2]. Built using Node.js, Express, and TypeScript with a clean layered architecture (Routes -> Controllers -> Services -> Models), it provides real-time AI advisories via Google Gemini, Cloudinary image hosting, and bilingual data support.
 
-## ♻ Features
+## 🌐 Live API & Deployment
 
-- **Secure Authentication:** JWT-based login and registration with password hashing (bcrypt).
-- **Role-Based Access Control (RBAC):** Separate permissions for `USER` and `ADMIN`.
-- **AI Integration:** Powered by **Google Gemini AI** for smart agricultural advice and automated content generation.
-- **Clean Architecture:** Structured folder system (Controllers, Services, Models, Routes) for high scalability.
-- **Strictly Typed:** Developed using **TypeScript** to ensure bug-free and robust code.
+- **Live Base API:** [https://krishoky-server.vercel.app/](https://krishoky-server.vercel.app/)[cite: 2]
+- **API Version Route:** `https://krishoky-server.vercel.app/api`
+- **Frontend App:** [https://krishoky-client.vercel.app/](https://krishoky-client.vercel.app/)[cite: 2]
+
+## ⚡ Features
+
+- **Layered Clean Architecture:** Strict separation of concerns (Routes -> Controllers -> Services -> Models -> Interfaces).
+- **Bilingual Schema Support:** Multilingual JSON structure (`{ bn: string, en: string }`) for localized content.
+- **Secure Authentication:** Custom JWT authentication alongside Google OAuth support and bcrypt password hashing.
+- **Role-Based Access Control (RBAC):** Granular authorization for `USER`, `SELLER`, and `ADMIN` roles.
+- **AI-Powered Services:** Integrated **Google Gemini API** (`gemini-1.5-flash`) for crop diagnosis, farming advisories, AI description generation, and review summarization.
 
 ## 🛠️ Tech Stack
 
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Language:** TypeScript
-- **Database:** MongoDB with Mongoose ODM
-- **AI Engine:** Google Gemini API
-- **Security:** JSON Web Token (JWT) & Bcrypt.js
+- **Runtime Environment:** Node.js[cite: 1, 2]
+- **Framework:** Express.js (TypeScript)[cite: 1, 2]
+- **Database & ODM:** MongoDB Atlas with Mongoose ODM
+- **AI Integration:** Google Gemini API (`@google/generative-ai`)[cite: 2]
+- **Image Hosting:** Cloudinary & Multer[cite: 2]
+- **Security:** JWT (JSON Web Tokens) & Bcrypt.js[cite: 2]
 
-## ⚙️ Installation & Setup
+## ⚙️ Environment Variables Setup
 
-1.  **Clone the repository:**
+Create a `.env` file in the root directory and add the following configuration keys:
 
-    ```bash
-    git clone [https://github.com/roky18/krishOky-server.git](https://github.com/roky18/krishOky-server.git)
-    cd krishOky-server
-    ```
+````env
+PORT=5000
+DATABASE_URL=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret_key
+BCRYPT_SALT_ROUNDS=12
 
-2.  **Install dependencies:**
+# AI & Media Services
+GEMINI_API_KEY=your_google_gemini_api_key
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
-    ```bash
-    npm install
-    ```
+# CORS & Frontend Origins
+FRONTEND_URL=[https://krishoky-client.vercel.app](https://krishoky-client.vercel.app)
 
-3.  **Environment Variables:**
-    Create a `.env` file in the root directory and add the following:
 
-    ```env
-    PORT=5000
-
-    ```
 
 4.  **Run the server:**
     ```bash
@@ -68,3 +72,4 @@
 ## 📜 License
 
 This project is licensed under the MIT License.
+````
